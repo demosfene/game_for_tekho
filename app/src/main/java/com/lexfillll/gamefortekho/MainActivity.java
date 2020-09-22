@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private byte[] encryptionIV;
     private TextView tvHint;
     private TextView tvCongratulation;
+    private ImageButton bClear;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,11 +79,13 @@ public class MainActivity extends AppCompatActivity {
         bPlay = findViewById(R.id.button_play);
         bRegenerate = findViewById(R.id.button_regenerate);
         bGuess = findViewById(R.id.button_guess);
+        bClear = findViewById(R.id.button_clear_et);
         tvHint = findViewById(R.id.tv_hint);
         tvErrorMassage = findViewById(R.id.tv_error_massage);
         tvCongratulation = findViewById(R.id.tv_congratulation);
         etNumber = findViewById(R.id.et_enter_the_number);
         gameGroup = findViewById(R.id.group);
+        bClear.setOnClickListener(v -> etNumber.getText().clear());
         bRegenerate.setOnClickListener(v -> {
                     etNumber.getText().clear();
                     loadHiddenNumber();

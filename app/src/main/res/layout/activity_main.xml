@@ -52,6 +52,17 @@
         app:layout_constraintStart_toStartOf="@id/tv_enter_the_number"
         app:layout_constraintTop_toBottomOf="@+id/tv_enter_the_number" />
 
+    <ImageButton
+        android:id="@+id/button_clear_et"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/et_enter_the_number"
+        app:layout_constraintTop_toTopOf="@id/et_enter_the_number"
+        app:layout_constraintBottom_toBottomOf="@id/et_enter_the_number"
+        android:background="@color/colorBackground"
+        android:src="@drawable/ic_action_name"
+       />
+
     <TextView
         android:id="@+id/tv_congratulation"
         android:layout_width="wrap_content"
@@ -125,7 +136,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:constraint_referenced_ids="button_guess, tv_enter_the_number, tv_enter_the_number, button_regenerate" />
+        app:constraint_referenced_ids="button_guess, tv_enter_the_number, tv_enter_the_number, button_regenerate, button_clear_et" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
