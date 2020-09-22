@@ -87,14 +87,15 @@ public class MainActivity extends AppCompatActivity {
         gameGroup = findViewById(R.id.group);
         bClear.setOnClickListener(v -> etNumber.getText().clear());
         bRegenerate.setOnClickListener(v -> {
-                    etNumber.getText().clear();
-                    loadHiddenNumber();
-                }
-        );
+            etNumber.getText().clear();
+            tvHint.setVisibility(View.GONE);
+            tvErrorMassage.setVisibility(View.GONE);
+            sharedPreferences.edit().remove(HIDDEN_NUMBER).apply();
+            loadHiddenNumber();
+        });
         bPlay.setVisibility(View.VISIBLE);
         sharedPreferences = getSharedPreferences(APP_PREFERENCE, Context.MODE_PRIVATE);
         bPlay.setOnClickListener(v -> {
-            sharedPreferences.edit().remove(HIDDEN_NUMBER).apply();
             loadHiddenNumber();
         });
 
