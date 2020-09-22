@@ -138,8 +138,8 @@ public class MainActivity extends AppCompatActivity {
 
     private BiometricPrompt.PromptInfo createPromptInfo() {
         promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Biometric login for my app")
-                .setNegativeButtonText("Use account password")
+                .setTitle(getString(R.string.biometric_login))
+                .setNegativeButtonText(getString(R.string.cancel))
                 .build();
         return promptInfo;
     }
@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
                                               @NonNull CharSequence errString) {
                 super.onAuthenticationError(errorCode, errString);
                 Toast.makeText(getApplicationContext(),
-                        "Authentication error: " + errString, Toast.LENGTH_SHORT)
+                        getString(R.string.auth_err) + errString, Toast.LENGTH_SHORT)
                         .show();
             }
 
@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAuthenticationFailed() {
                 super.onAuthenticationFailed();
-                Toast.makeText(getApplicationContext(), "Authentication failed",
+                Toast.makeText(getApplicationContext(), R.string.auth_fail,
                         Toast.LENGTH_SHORT)
                         .show();
             }
@@ -193,7 +193,6 @@ public class MainActivity extends AppCompatActivity {
         tvHint.setVisibility(View.GONE);
         bRegenerate.setVisibility(View.VISIBLE);
         tvCongratulation.setVisibility(View.VISIBLE);
-
     }
 
     private void decryptHiddenNumber(BiometricPrompt.AuthenticationResult result) {
@@ -207,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void encryptHiddenNumber(BiometricPrompt.AuthenticationResult result) {
         try {
-            hiddenNumber = new Random().nextInt(10000);
+            hiddenNumber = 1000 + new Random().nextInt(9000);
             byte[] cipherText = result.getCryptoObject().getCipher().doFinal(String.valueOf(hiddenNumber).getBytes(StandardCharsets.UTF_8));
             String saveThis = Base64.encodeToString(cipherText, Base64.DEFAULT);
             sharedPreferences.edit().putString(HIDDEN_NUMBER, saveThis).apply();
@@ -287,4 +286,5 @@ public class MainActivity extends AppCompatActivity {
         }
         return cipher;
     }
+
 }

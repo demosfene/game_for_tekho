@@ -9,4 +9,8 @@
     <string name="hint_less">Hidden number is less</string>
     <string name="error_not_number">This is not a number</string>
     <string name="regenerate">regenerate</string>
+    <string name="biometric_login">Biometric login for my app</string>
+    <string name="cancel">Cancel</string>
+    <string name="auth_err">\"Authentication error: \"</string>
+    <string name="auth_fail">Authentication failed</string>
 </resources>
