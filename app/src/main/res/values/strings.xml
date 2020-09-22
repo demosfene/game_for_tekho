@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Game for TEKHO</string>
+    <string name="enter_the_number">Enter the number</string>
+    <string name="guess">guess</string>
+    <string name="secret_key_name">Biometric_encryption_key</string>
+    <string name="androidProvider">AndroidKeyStore</string>
+    <string name="congratulation">It\'s incredible, you guessed it</string>
+    <string name="hint_larger">Hidden number is larger</string>
+    <string name="hint_less">Hidden number is less</string>
+    <string name="error_not_number">This is not a number</string>
+    <string name="regenerate">regenerate</string>
+</resources>
