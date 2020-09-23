@@ -31,6 +31,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.Executor;
 
@@ -95,14 +96,13 @@ public class MainActivity extends AppCompatActivity {
         });
         bPlay.setVisibility(View.VISIBLE);
         sharedPreferences = getSharedPreferences(APP_PREFERENCE, Context.MODE_PRIVATE);
-        bPlay.setOnClickListener(v -> {
-            loadHiddenNumber();
-        });
+        bPlay.setOnClickListener(v -> loadHiddenNumber());
 
         bGuess.setOnClickListener(v -> {
             try {
                 tvErrorMassage.setVisibility(View.GONE);
                 enterNumber = Integer.parseInt(etNumber.getText().toString());
+                decryptHiddenNumber(generateCipher());
                 switch (enterNumber.compareTo(hiddenNumber)) {
                     case 1:
                         tvHint.setVisibility(View.VISIBLE);
@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
                         tvHint.setText(R.string.hint_larger);
                         break;
                 }
+                hiddenNumber = null;
             } catch (NumberFormatException e) {
                 tvErrorMassage.setVisibility(View.VISIBLE);
                 tvErrorMassage.setText(R.string.error_not_number);
@@ -167,11 +168,8 @@ public class MainActivity extends AppCompatActivity {
                     @NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
                 startGame();
-                if (readyToEncrypt) {
-                    encryptHiddenNumber(result);
-                } else {
-                    decryptHiddenNumber(result);
-                }
+                encryptHiddenNumber(Objects.requireNonNull(Objects.requireNonNull(result.getCryptoObject()).getCipher()));
+
             }
 
             @Override
@@ -199,22 +197,26 @@ public class MainActivity extends AppCompatActivity {
         tvCongratulation.setVisibility(View.VISIBLE);
     }
 
-    private void decryptHiddenNumber(BiometricPrompt.AuthenticationResult result) {
+    private void decryptHiddenNumber(Cipher cipher) {
         try {
-            String stringDecryptHiddenNumber = new String(result.getCryptoObject().getCipher().doFinal(encryptedHiddenNumber), StandardCharsets.UTF_8);
+            sPHiddenNumber = sharedPreferences.getString(HIDDEN_NUMBER, "");
+            String sPEncryptionIV = sharedPreferences.getString(HIDDEN_NUMBER_IV, "");
+            encryptedHiddenNumber = Base64.decode(sPHiddenNumber, Base64.DEFAULT);
+            encryptionIV = Base64.decode(sPEncryptionIV, Base64.DEFAULT);
+            String stringDecryptHiddenNumber = new String(cipher.doFinal(encryptedHiddenNumber), StandardCharsets.UTF_8);
             hiddenNumber = Integer.parseInt(stringDecryptHiddenNumber);
         } catch (BadPaddingException | IllegalBlockSizeException ex) {
             ex.printStackTrace();
         }
     }
 
-    private void encryptHiddenNumber(BiometricPrompt.AuthenticationResult result) {
+    private void encryptHiddenNumber(Cipher cipher) {
         try {
             hiddenNumber = 1000 + new Random().nextInt(9000);
-            byte[] cipherText = result.getCryptoObject().getCipher().doFinal(String.valueOf(hiddenNumber).getBytes(StandardCharsets.UTF_8));
-            String saveThis = Base64.encodeToString(cipherText, Base64.DEFAULT);
+            encryptedHiddenNumber = cipher.doFinal(String.valueOf(hiddenNumber).getBytes(StandardCharsets.UTF_8));
+            String saveThis = Base64.encodeToString(encryptedHiddenNumber, Base64.DEFAULT);
             sharedPreferences.edit().putString(HIDDEN_NUMBER, saveThis).apply();
-            sharedPreferences.edit().putString(HIDDEN_NUMBER_IV, Base64.encodeToString(result.getCryptoObject().getCipher().getIV(), Base64.DEFAULT)).apply();
+            sharedPreferences.edit().putString(HIDDEN_NUMBER_IV, Base64.encodeToString(cipher.getIV(), Base64.DEFAULT)).apply();
         } catch (BadPaddingException | IllegalBlockSizeException e) {
             e.printStackTrace();
         }
@@ -246,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
                             KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
                             .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
                             .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
-                            .setUserAuthenticationRequired(true)
+                            .setUserAuthenticationRequired(false)
                             .setInvalidatedByBiometricEnrollment(false)
                             .build());
         }
@@ -283,6 +285,8 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {
             try {
+                String sPEncryptionIV = sharedPreferences.getString(HIDDEN_NUMBER_IV, "");
+                encryptionIV = Base64.decode(sPEncryptionIV, Base64.DEFAULT);
                 cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(encryptionIV));
             } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
                 e.printStackTrace();
